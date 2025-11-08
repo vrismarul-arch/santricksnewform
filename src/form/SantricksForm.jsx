@@ -7,7 +7,7 @@ const { Option } = Select;
 const { Step } = Steps;
 
 const SantricksForm = () => {
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = import.meta.env.VITE_API_URL || "https://santrickbackenew.onrender.com";
 
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -36,11 +36,7 @@ const SantricksForm = () => {
 
   const handleSubmit = async () => {
     try {
-      const payload = {
-        ...formData,
-        date: formData.date ? formData.date.format("YYYY-MM-DD") : null
-      };
-
+      const payload = { ...formData, date: formData.date ? formData.date.format("YYYY-MM-DD") : null };
       await axios.post(`${API_URL}/api/entries/add`, payload);
       message.success("Form submitted successfully!");
       setStep(0);
@@ -68,11 +64,7 @@ const SantricksForm = () => {
       content: (
         <Form layout="vertical">
           <Form.Item label="Event Type*" required>
-            <Select
-              placeholder="Select event type"
-              value={formData.eventType}
-              onChange={val => handleChange("eventType", val)}
-            >
+            <Select value={formData.eventType} onChange={val => handleChange("eventType", val)}>
               <Option value="Corporate Live Show">Corporate Live Show</Option>
               <Option value="Wedding Event">Wedding Event</Option>
               <Option value="Birthday Celebration">Birthday Celebration</Option>
@@ -92,11 +84,7 @@ const SantricksForm = () => {
             <Input value={formData.venue} onChange={e => handleChange("venue", e.target.value)} />
           </Form.Item>
           <Form.Item label="Audience Size*" required>
-            <Select
-              placeholder="Select audience size"
-              value={formData.audizeSize}
-              onChange={val => handleChange("audizeSize", val)}
-            >
+            <Select value={formData.audizeSize} onChange={val => handleChange("audizeSize", val)}>
               <Option value="0-50">0-50</Option>
               <Option value="51-100">51-100</Option>
               <Option value="101-200">101-200</Option>
@@ -105,11 +93,7 @@ const SantricksForm = () => {
             </Select>
           </Form.Item>
           <Form.Item label="Event Duration*" required>
-            <Select
-              placeholder="Select duration"
-              value={formData.duration}
-              onChange={val => handleChange("duration", val)}
-            >
+            <Select value={formData.duration} onChange={val => handleChange("duration", val)}>
               <Option value="1 Hour">1 Hour</Option>
               <Option value="2 Hours">2 Hours</Option>
               <Option value="3 Hours">3 Hours</Option>
@@ -126,7 +110,6 @@ const SantricksForm = () => {
         <Form layout="vertical">
           <Form.Item label="Add-ons">
             <Checkbox.Group
-              style={{ width: "100%" }}
               value={Object.keys(formData.addOns).filter(k => formData.addOns[k])}
               onChange={checkedValues => {
                 const newAddOns = { portrait: false, makingVideo: false, musicSync: false, customTheme: false, liveMode: false };
