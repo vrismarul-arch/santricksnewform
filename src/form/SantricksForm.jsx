@@ -7,7 +7,8 @@ const { Option } = Select;
 const { Step } = Steps;
 
 const SantricksForm = () => {
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+
   const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     eventType: "",
@@ -35,7 +36,12 @@ const SantricksForm = () => {
 
   const handleSubmit = async () => {
     try {
-      await axios.post(`${API_URL}/api/entries/add`, formData);
+      const payload = {
+        ...formData,
+        date: formData.date ? formData.date.format("YYYY-MM-DD") : null
+      };
+
+      await axios.post(`${API_URL}/api/entries/add`, payload);
       message.success("Form submitted successfully!");
       setStep(0);
       setFormData({
@@ -62,14 +68,18 @@ const SantricksForm = () => {
       content: (
         <Form layout="vertical">
           <Form.Item label="Event Type*" required>
-            <Select placeholder="Select event type" value={formData.eventType} onChange={val => handleChange("eventType", val)}>
-              <Option>Corporate Live Show</Option>
-              <Option>Wedding Event</Option>
-              <Option>Birthday Celebration</Option>
-              <Option>Portrait Gifting</Option>
-              <Option>Corporate Pre-Shoot</Option>
-              <Option>Sand Lightboard</Option>
-              <Option>Name Revealing Ceremony</Option>
+            <Select
+              placeholder="Select event type"
+              value={formData.eventType}
+              onChange={val => handleChange("eventType", val)}
+            >
+              <Option value="Corporate Live Show">Corporate Live Show</Option>
+              <Option value="Wedding Event">Wedding Event</Option>
+              <Option value="Birthday Celebration">Birthday Celebration</Option>
+              <Option value="Portrait Gifting">Portrait Gifting</Option>
+              <Option value="Corporate Pre-Shoot">Corporate Pre-Shoot</Option>
+              <Option value="Sand Lightboard">Sand Lightboard</Option>
+              <Option value="Name Revealing Ceremony">Name Revealing Ceremony</Option>
             </Select>
           </Form.Item>
           <Form.Item label="Event Name">
@@ -82,21 +92,29 @@ const SantricksForm = () => {
             <Input value={formData.venue} onChange={e => handleChange("venue", e.target.value)} />
           </Form.Item>
           <Form.Item label="Audience Size*" required>
-            <Select placeholder="Select audience size" value={formData.audizeSize} onChange={val => handleChange("audizeSize", val)}>
-              <Option>0-50</Option>
-              <Option>51-100</Option>
-              <Option>101-200</Option>
-              <Option>201-500</Option>
-              <Option>500+</Option>
+            <Select
+              placeholder="Select audience size"
+              value={formData.audizeSize}
+              onChange={val => handleChange("audizeSize", val)}
+            >
+              <Option value="0-50">0-50</Option>
+              <Option value="51-100">51-100</Option>
+              <Option value="101-200">101-200</Option>
+              <Option value="201-500">201-500</Option>
+              <Option value="500+">500+</Option>
             </Select>
           </Form.Item>
           <Form.Item label="Event Duration*" required>
-            <Select placeholder="Select duration" value={formData.duration} onChange={val => handleChange("duration", val)}>
-              <Option>1 Hour</Option>
-              <Option>2 Hours</Option>
-              <Option>3 Hours</Option>
-              <Option>Half Day</Option>
-              <Option>Full Day</Option>
+            <Select
+              placeholder="Select duration"
+              value={formData.duration}
+              onChange={val => handleChange("duration", val)}
+            >
+              <Option value="1 Hour">1 Hour</Option>
+              <Option value="2 Hours">2 Hours</Option>
+              <Option value="3 Hours">3 Hours</Option>
+              <Option value="Half Day">Half Day</Option>
+              <Option value="Full Day">Full Day</Option>
             </Select>
           </Form.Item>
         </Form>
@@ -170,9 +188,7 @@ const SantricksForm = () => {
 
       <div className="form-container">
         <Steps current={step} responsive>
-          {steps.map((s, index) => (
-            <Step key={index} title={s.title} />
-          ))}
+          {steps.map((s, index) => <Step key={index} title={s.title} />)}
         </Steps>
 
         <div className="step-content" style={{ marginTop: "20px", transition: "all 0.5s ease" }}>
