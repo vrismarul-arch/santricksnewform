@@ -38,17 +38,26 @@ const SantricksForm = () => {
   };
 
   const handleSubmit = async () => {
-    try {
-      const payload = { ...formData, date: formData.date ? formData.date.format("YYYY-MM-DD") : null };
-      await axios.post(`${API_URL}/api/entries/add`, payload);
+  try {
+    const payload = { 
+      ...formData, 
+      date: formData.date ? formData.date.format("YYYY-MM-DD") : null 
+    };
 
-      message.success("Form submitted successfully!");
-      navigate("/success"); // ✅ Redirect to success page
-    } catch (err) {
-      console.error(err);
-      message.error("Something went wrong!");
-    }
-  };
+    await axios.post(`${API_URL}/api/entries/add`, payload);
+
+    message.success("Form submitted successfully!");
+    navigate("/success"); // ✅ Redirect to success page
+  } catch (err) {
+    console.error(err);
+
+    // Optional: show message toast
+    message.error("Something went wrong!");
+
+    navigate("/failure"); // ❌ Redirect to failure page
+  }
+};
+
 
   const steps = [
     {

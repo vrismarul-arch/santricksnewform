@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import SantricksForm from "../form/SantricksForm";
 import SuccessPage from "../form/SuccessPage";
+import FailurePage from "../form/FailurePage";
 
 // ✅ Create your routes here
 const router = createBrowserRouter([
@@ -12,6 +13,10 @@ const router = createBrowserRouter([
   {
     path: "/success",
     element: <SuccessPage />, // Contact Form Page
+  },
+  {
+    path: "/failure",
+    element: <FailurePage />, // Contact Form Page
   },
 ]);
 
