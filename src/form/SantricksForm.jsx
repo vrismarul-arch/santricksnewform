@@ -10,6 +10,8 @@ const SantricksForm = () => {
   const API_URL = import.meta.env.VITE_API_URL || "https://santrickbackenew.onrender.com";
 
   const [step, setStep] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+
   const [formData, setFormData] = useState({
     eventType: "",
     name: "",
@@ -38,25 +40,89 @@ const SantricksForm = () => {
     try {
       const payload = { ...formData, date: formData.date ? formData.date.format("YYYY-MM-DD") : null };
       await axios.post(`${API_URL}/api/entries/add`, payload);
+
       message.success("Form submitted successfully!");
-      setStep(0);
-      setFormData({
-        eventType: "",
-        name: "",
-        date: null,
-        venue: "",
-        audizeSize: "",
-        duration: "",
-        addOns: { portrait: false, makingVideo: false, musicSync: false, customTheme: false, liveMode: false },
-        contactName: "",
-        contactEmail: "",
-        contactPhone: ""
-      });
+      setSubmitted(true);
     } catch (err) {
       console.error(err);
       message.error("Something went wrong!");
     }
   };
+
+  // ✅ Modern Success Screen UI
+  if (submitted) {
+    return (
+      <div style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#f6f7fb"
+      }}>
+        <Card style={{
+          width: 500,
+          textAlign: "center",
+          padding: "40px 30px",
+          borderRadius: "14px",
+          boxShadow: "0 8px 25px rgba(0,0,0,0.08)"
+        }}>
+
+          <div
+            style={{
+              width: 80,
+              height: 80,
+              margin: "0 auto 20px",
+              borderRadius: "50%",
+              background: "#4CAF50",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              color: "white",
+              fontSize: "40px",
+              animation: "pop 0.4s ease"
+            }}
+          >✅</div>
+
+          <h2 style={{ marginBottom: "10px", color: "#333" }}>
+            Booking Confirmed!
+          </h2>
+          <p style={{ fontSize: "16px", color: "#555", marginBottom: "10px" }}>
+            Thank you for choosing <strong>Sandtricks</strong> 🎉
+          </p>
+
+          <p style={{ fontSize: "15px", color: "#666" }}>
+            📩 A confirmation email has been sent to your inbox.
+          </p>
+          <p style={{ fontSize: "15px", color: "#666", marginBottom: "20px" }}>
+            👥 Our team will contact you shortly to discuss the event details.
+          </p>
+
+          <Button
+            type="primary"
+            size="large"
+            style={{
+              borderRadius: "6px",
+              padding: "6px 20px",
+              background: "#d97706",
+              borderColor: "#d97706"
+            }}
+            onClick={() => setSubmitted(false)}
+          >
+            Book Another Event
+          </Button>
+        </Card>
+
+        <style>
+          {`
+          @keyframes pop {
+            0% { transform: scale(0.7); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+          }
+          `}
+        </style>
+      </div>
+    );
+  }
 
   const steps = [
     {
@@ -174,7 +240,7 @@ const SantricksForm = () => {
           {steps.map((s, index) => <Step key={index} title={s.title} />)}
         </Steps>
 
-        <div className="step-content" style={{ marginTop: "20px", transition: "all 0.5s ease" }}>
+        <div className="step-content" style={{ marginTop: "20px" }}>
           {steps[step].content}
         </div>
 
