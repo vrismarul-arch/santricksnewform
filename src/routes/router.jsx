@@ -10,7 +10,7 @@ const router = createBrowserRouter([
     element: <SantricksForm />, // Contact Form Page
   },
   {
-    path: "/sucess",
+    path: "/success",
     element: <SuccessPage />, // Contact Form Page
   },
 ]);
