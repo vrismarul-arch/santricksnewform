@@ -1,41 +1,49 @@
 import React, { useState } from "react";
-import { Form, Input, Button, Card, message } from "antd";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import { message, Card, Input, Button } from "antd";
 
 const AdminLogin = () => {
-  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const onFinish = async (values) => {
-    setLoading(true);
-    try {
-      const res = await api.post("/api/admin/login", values);
-      localStorage.setItem("adminToken", res.data.token);
-      message.success("Login Successful!");
-      navigate("/admin/dashboard");
-    } catch {
-      message.error("Invalid Credentials");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      return message.error("Email & Password required!");
     }
-    setLoading(false);
+
+    try {
+      const res = await api.post("/api/admin/login", { email, password });
+
+      if (res.data.success) {
+        localStorage.setItem("adminToken", res.data.token);
+        message.success("Login Success!");
+        navigate("/admin/dashboard");
+      }
+    } catch {
+      message.error("Invalid Email or Password ❌");
+    }
   };
 
   return (
-    <div style={{ display:'flex', justifyContent:'center', alignItems:'center', height:'100vh' }}>
+    <div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <Card title="Admin Login" style={{ width: 350 }}>
-        <Form layout="vertical" onFinish={onFinish}>
-          <Form.Item label="Email" name="email" rules={[{ required: true }]}>
-            <Input type="email" />
-          </Form.Item>
-
-          <Form.Item label="Password" name="password" rules={[{ required: true }]}>
-            <Input.Password />
-          </Form.Item>
-
-          <Button type="primary" htmlType="submit" loading={loading} block>
-            Login
-          </Button>
-        </Form>
+        <Input
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ marginBottom: 10 }}
+        />
+        <Input.Password
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          style={{ marginBottom: 20 }}
+        />
+        <Button type="primary" block onClick={handleLogin}>
+          Login
+        </Button>
       </Card>
     </div>
   );

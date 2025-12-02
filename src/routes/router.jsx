@@ -1,50 +1,50 @@
-import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 // Public Pages
 import SantricksForm from "../form/SantricksForm";
 import SuccessPage from "../form/SuccessPage";
 import FailurePage from "../form/FailurePage";
 
+// Admin Login
+import AdminLogin from "../pages/admin/AdminLogin";
+
 // Admin Layout + Pages
 import AdminLayout from "../components/layout/AdminLayout";
+import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminEntries from "../pages/admin/AdminEntries";
 import AdminCalendar from "../pages/admin/AdminCalendar";
-import AdminDashboard from "../pages/admin/AdminDashboard";
-import AdminLogin from "../pages/admin/AdminLogin"; // ⭐ Import Admin Login page
 
-// 🔒 Protected Route Wrapper
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem("adminToken");
-
-  return token ? children : <Navigate to="/admin/login" replace />;
-};
+// Protection
+import ProtectedAdminRoute from "./ProtectedAdminRoute";
 
 const router = createBrowserRouter([
-  // Public routes
+  // 🌍 Public Routes
   { path: "/", element: <SantricksForm /> },
   { path: "/success", element: <SuccessPage /> },
   { path: "/failure", element: <FailurePage /> },
 
-  // Admin Login route (public)
+  // 🔑 Admin Login Route (No Protection)
   { path: "/admin/login", element: <AdminLogin /> },
 
-  // Admin Secure Routes
+  // 🔐 Protected Admin Routes
   {
     path: "/admin",
-    element: (
-      <ProtectedRoute>
-        <AdminLayout />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedAdminRoute />, // Security Gate 🚫➡🚪
     children: [
-      { path: "dashboard", element: <AdminDashboard /> },
-      { path: "entries", element: <AdminEntries /> },
-      { path: "calendar", element: <AdminCalendar /> },
+      {
+        path: "",
+        element: <AdminLayout />, // Sidebar + Topbar Layout
+        children: [
+          { path: "dashboard", element: <AdminDashboard /> },
+          { path: "entries", element: <AdminEntries /> },
+          { path: "calendar", element: <AdminCalendar /> },
+        ],
+      },
     ],
   },
 
-  // Redirect unknown routes
-  { path: "*", element: <Navigate to="/" /> },
+  // ❌ 404 Fallback (Optional)
+  { path: "*", element: <h2 style={{ padding: 20 }}>404 - Page Not Found</h2> },
 ]);
 
 export default function AppRouter() {
