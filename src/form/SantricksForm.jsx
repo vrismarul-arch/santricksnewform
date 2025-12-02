@@ -1,16 +1,14 @@
 import { useState } from "react";
-import axios from "axios";
 import { Form, Input, Select, DatePicker, Checkbox, Button, Steps, Card, message } from "antd";
 import { useNavigate } from "react-router-dom";
+import api from "../api/api";
 import "./SantricksForm.css";
 
 const { Option } = Select;
 const { Step } = Steps;
 
 const SantricksForm = () => {
-  const API_URL = import.meta.env.VITE_API_URL || "https://santrickbackenew.onrender.com";
   const navigate = useNavigate();
-
   const [step, setStep] = useState(0);
 
   const [formData, setFormData] = useState({
@@ -20,14 +18,27 @@ const SantricksForm = () => {
     venue: "",
     audizeSize: "",
     duration: "",
-    addOns: { portrait: false, makingVideo: false, musicSync: false, customTheme: false, liveMode: false },
+    addOns: {
+      portrait: false,
+      makingVideo: false,
+      musicSync: false,
+      customTheme: false,
+      liveMode: false
+    },
     contactName: "",
     contactEmail: "",
     contactPhone: ""
   });
 
-  const nextStep = () => setStep(step + 1);
-  const prevStep = () => setStep(step - 1);
+  const nextStep = () => {
+    setStep(step + 1);
+    window.scrollTo(0, 0);
+  };
+
+  const prevStep = () => {
+    setStep(step - 1);
+    window.scrollTo(0, 0);
+  };
 
   const handleChange = (name, value) => {
     if (name in formData.addOns) {
@@ -38,26 +49,22 @@ const SantricksForm = () => {
   };
 
   const handleSubmit = async () => {
-  try {
-    const payload = { 
-      ...formData, 
-      date: formData.date ? formData.date.format("YYYY-MM-DD") : null 
-    };
+    try {
+      const payload = {
+        ...formData,
+        date: formData.date ? formData.date.format("YYYY-MM-DD") : null
+      };
 
-    await axios.post(`${API_URL}/api/entries/add`, payload);
+      await api.post("/api/entries/add", payload);
 
-    message.success("Form submitted successfully!");
-    navigate("/success"); // ✅ Redirect to success page
-  } catch (err) {
-    console.error(err);
-
-    // Optional: show message toast
-    message.error("Something went wrong!");
-
-    navigate("/failure"); // ❌ Redirect to failure page
-  }
-};
-
+      message.success("Form submitted successfully!");
+      navigate("/success");
+    } catch (err) {
+      console.error(err);
+      message.error("Something went wrong!");
+      navigate("/failure");
+    }
+  };
 
   const steps = [
     {
@@ -65,7 +72,7 @@ const SantricksForm = () => {
       content: (
         <Form layout="vertical">
           <Form.Item label="Event Type*" required>
-            <Select value={formData.eventType} onChange={val => handleChange("eventType", val)}>
+            <Select value={formData.eventType} onChange={(v) => handleChange("eventType", v)}>
               <Option value="Corporate Live Show">Corporate Live Show</Option>
               <Option value="Wedding Event">Wedding Event</Option>
               <Option value="Birthday Celebration">Birthday Celebration</Option>
@@ -77,19 +84,23 @@ const SantricksForm = () => {
           </Form.Item>
 
           <Form.Item label="Event Name">
-            <Input value={formData.name} onChange={e => handleChange("name", e.target.value)} />
+            <Input value={formData.name} onChange={(e) => handleChange("name", e.target.value)} />
           </Form.Item>
 
           <Form.Item label="Event Date*" required>
-            <DatePicker style={{ width: "100%" }} value={formData.date} onChange={date => handleChange("date", date)} />
+            <DatePicker
+              style={{ width: "100%" }}
+              value={formData.date}
+              onChange={(d) => handleChange("date", d)}
+            />
           </Form.Item>
 
           <Form.Item label="Venue / Location">
-            <Input value={formData.venue} onChange={e => handleChange("venue", e.target.value)} />
+            <Input value={formData.venue} onChange={(e) => handleChange("venue", e.target.value)} />
           </Form.Item>
 
           <Form.Item label="Audience Size*" required>
-            <Select value={formData.audizeSize} onChange={val => handleChange("audizeSize", val)}>
+            <Select value={formData.audizeSize} onChange={(v) => handleChange("audizeSize", v)}>
               <Option value="0-50">0-50</Option>
               <Option value="51-100">51-100</Option>
               <Option value="101-200">101-200</Option>
@@ -99,7 +110,7 @@ const SantricksForm = () => {
           </Form.Item>
 
           <Form.Item label="Event Duration*" required>
-            <Select value={formData.duration} onChange={val => handleChange("duration", val)}>
+            <Select value={formData.duration} onChange={(v) => handleChange("duration", v)}>
               <Option value="1 Hour">1 Hour</Option>
               <Option value="2 Hours">2 Hours</Option>
               <Option value="3 Hours">3 Hours</Option>
@@ -115,11 +126,11 @@ const SantricksForm = () => {
       content: (
         <Form layout="vertical">
           <Checkbox.Group
-            value={Object.keys(formData.addOns).filter(k => formData.addOns[k])}
-            onChange={checkedValues => {
-              const newAddOns = { portrait: false, makingVideo: false, musicSync: false, customTheme: false, liveMode: false };
-              checkedValues.forEach(k => (newAddOns[k] = true));
-              setFormData({ ...formData, addOns: newAddOns });
+            value={Object.keys(formData.addOns).filter((k) => formData.addOns[k])}
+            onChange={(checked) => {
+              const updated = { ...formData.addOns };
+              Object.keys(updated).forEach((k) => (updated[k] = checked.includes(k)));
+              setFormData({ ...formData, addOns: updated });
             }}
           >
             <Checkbox value="portrait">Portrait</Checkbox>
@@ -136,15 +147,22 @@ const SantricksForm = () => {
       content: (
         <Form layout="vertical">
           <Form.Item label="Your Name*" required>
-            <Input value={formData.contactName} onChange={e => handleChange("contactName", e.target.value)} />
+            <Input value={formData.contactName} onChange={(e) => handleChange("contactName", e.target.value)} />
           </Form.Item>
 
           <Form.Item label="Your Email*" required>
-            <Input type="email" value={formData.contactEmail} onChange={e => handleChange("contactEmail", e.target.value)} />
+            <Input
+              type="email"
+              value={formData.contactEmail}
+              onChange={(e) => handleChange("contactEmail", e.target.value)}
+            />
           </Form.Item>
 
           <Form.Item label="Your Phone*" required>
-            <Input value={formData.contactPhone} onChange={e => handleChange("contactPhone", e.target.value)} />
+            <Input
+              value={formData.contactPhone}
+              onChange={(e) => handleChange("contactPhone", e.target.value)}
+            />
           </Form.Item>
         </Form>
       )
@@ -170,9 +188,11 @@ const SantricksForm = () => {
 
   return (
     <div className="hero-container">
+      
+      {/* ⭐ Hero Banner Added */}
       <div className="hero-banner">
-        <h1>Book Your Sand Art Event</h1>
-        <p>One step at a time — we'll guide you through the process.</p>
+        <h1 className="hero-title">Book Your Sand Art Event</h1>
+        <p className="hero-sub">One step at a time — We guide you through the process</p>
       </div>
 
       <div className="form-container">
